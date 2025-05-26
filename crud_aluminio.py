@@ -3,22 +3,16 @@ from db_connection import get_connection
 
 def aluminio_view(page: ft.Page) -> ft.Control:
     page.title = "Aluminio"
-    # Quito el scroll de toda la pagina pa
-    # page.scroll = ft.ScrollMode.AUTO
 
-    # ──────────────── CONTROLES ────────────────
-    # Filtros de búsqueda
     filtro_perfil = ft.Dropdown(label="Perfil", options=[], width=150)
     filtro_color = ft.Dropdown(label="Color", options=[], width=150)
     filtro_serie = ft.Dropdown(label="Serie", options=[], width=150)
 
-    # Formulario de nuevo registro
     nuevo_perfil = ft.Dropdown(label="Perfil", options=[], width=150)
     nuevo_color = ft.Dropdown(label="Color", options=[], width=150)
     nuevo_serie = ft.Dropdown(label="Serie", options=[], width=150)
     nuevo_largo = ft.TextField(label="Largo", width=150, keyboard_type=ft.KeyboardType.NUMBER)
 
-    # Tabla de resultados
     tabla = ft.DataTable(columns=[
         ft.DataColumn(ft.Text("ID")),
         ft.DataColumn(ft.Text("Perfil")),
@@ -28,7 +22,6 @@ def aluminio_view(page: ft.Page) -> ft.Control:
         ft.DataColumn(ft.Text("Acciones")),
     ])
 
-    # ──────────────── FUNCIONES ────────────────
     def cargar_opciones():
         """Carga los valores de los dropdowns desde la base de datos."""
         conn = get_connection()
@@ -122,7 +115,7 @@ def aluminio_view(page: ft.Page) -> ft.Control:
         filtro_perfil.value = filtro_color.value = filtro_serie.value = None
         cargar_registros()
 
-    # ──────────────── DISEÑO DE LA PANTALLA ────────────────
+    
     cargar_opciones()
     cargar_registros()
 

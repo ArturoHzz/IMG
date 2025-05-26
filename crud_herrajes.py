@@ -40,12 +40,12 @@ def herrajes_view(page: ft.Page) -> ft.Control:
             nuevos[key].options = opciones.copy()
         conn.close(); page.update()
 
-    def cargar():
+    def cargar(e=None):
         tabla.rows.clear()
         conn = get_connection(); cur = conn.cursor()
         sql = """
             SELECT h.idHerrajes, ca.nombre_carretas, ja.tipo_jaladeras, ch.tipo_chapa,
-                   b.tipo_bisagra, co.nombre_color
+                b.tipo_bisagra, co.nombre_color
             FROM herrajes h
             LEFT JOIN carretas ca ON h.idCarretas = ca.idCarretas
             LEFT JOIN jaladeras ja ON h.idJaladeras = ja.idJaladeras
@@ -53,7 +53,30 @@ def herrajes_view(page: ft.Page) -> ft.Control:
             LEFT JOIN bisagras b ON h.idBisagras = b.idBisagras
             LEFT JOIN color co ON h.idColor = co.idColor
         """
-        cur.execute(sql)
+
+        condiciones = []
+        valores = []
+
+        if filtros['carretas'].value:
+            condiciones.append("h.idCarretas = %s")
+            valores.append(filtros['carretas'].value)
+        if filtros['jaladeras'].value:
+            condiciones.append("h.idJaladeras = %s")
+            valores.append(filtros['jaladeras'].value)
+        if filtros['chapa'].value:
+            condiciones.append("h.idChapa = %s")
+            valores.append(filtros['chapa'].value)
+        if filtros['bisagras'].value:
+            condiciones.append("h.idBisagras = %s")
+            valores.append(filtros['bisagras'].value)
+        if filtros['color'].value:
+            condiciones.append("h.idColor = %s")
+            valores.append(filtros['color'].value)
+
+        if condiciones:
+            sql += " WHERE " + " AND ".join(condiciones)
+
+        cur.execute(sql, valores)
         for row in cur.fetchall():
             tabla.rows.append(ft.DataRow(cells=[
                 ft.DataCell(ft.Text(str(row[0]))),
@@ -61,6 +84,11 @@ def herrajes_view(page: ft.Page) -> ft.Control:
                 ft.DataCell(ft.IconButton(icon=ft.Icons.DELETE, on_click=lambda e, id=row[0]: eliminar(id)))
             ]))
         conn.close(); page.update()
+
+    def limpiar_filtros(e=None):
+        for dd in filtros.values():
+            dd.value = None
+        cargar()
 
     def agregar(e):
         conn = get_connection(); cur = conn.cursor()
@@ -81,7 +109,13 @@ def herrajes_view(page: ft.Page) -> ft.Control:
 
     return ft.Column([
         ft.Text("Filtros y Agregado de Herrajes", size=18, weight="bold"),
-        ft.Row(list(filtros.values()) + [ft.ElevatedButton("Buscar", on_click=cargar)], wrap=True),
+        ft.Row(
+            list(filtros.values()) + [
+                ft.ElevatedButton("Buscar", on_click=cargar),
+                ft.ElevatedButton("Limpiar", on_click=limpiar_filtros)
+            ],
+            wrap=True
+        ),
         ft.Divider(),
         ft.Row(list(nuevos.values()) + [ft.ElevatedButton("Agregar", on_click=agregar)], wrap=True),
         ft.Divider(),
@@ -91,6 +125,7 @@ def herrajes_view(page: ft.Page) -> ft.Control:
             padding=10
         )
     ])
+
 
 
 

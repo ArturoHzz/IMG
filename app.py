@@ -1,4 +1,3 @@
-# app.py
 import flet as ft
 from crud_aluminio import aluminio_view
 from crud_vidrio import vidrio_view
@@ -9,7 +8,6 @@ from stock_view import stock_view
 
 def main(page: ft.Page):
     page.title = "Gestión de Inventario"
-    page.scroll = ft.ScrollMode.AUTO
 
     # Encabezado visual
     encabezado = ft.Container(
